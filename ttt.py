@@ -11,7 +11,22 @@ from cv2 import cv2
 X = "X"
 O = "O"
 
+def mouse_drawing(event, x, y, flags, params):
+    global gl_point1, gl_point2, selecting
 
+    if event == cv2.EVENT_LBUTTONDOWN:
+        selecting = True
+        gl_point1 = (x, y)
+        gl_point2 = (x, y)
+    elif event == cv2.EVENT_MOUSEMOVE:
+        if selecting is True:
+            gl_point2 = (x, y)
+    elif event == cv2.EVENT_LBUTTONUP:
+        selecting = False
+        print('finished square')
+    elif event == cv2.EVENT_RBUTTONUP:
+        selecting = False
+        gl_point1 = gl_point2 = None
 
 cap = cv2.VideoCapture("rtsp://admin:12345678@192.168.100.159:10554/tcp/av0_0")
 # cap = cv2.VideoCapture("rtsp://admin:12345678@10.8.134.131:10554/tcp/av0_0")

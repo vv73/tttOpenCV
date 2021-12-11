@@ -96,9 +96,28 @@ def detect_sign(contour):
                              (left_top[0] + j * cell_size + 5, left_top[1] + (i + 1) * cell_size - 5), color, 4)
 
 ```
-![Отрисовка позиции](Image%20715-2.png)
+![Отрисовка позиции](Image%20715-2.png) 
 
 ## Выделение
 
 Написана функция выделения части доски мышью, что предотвращает 
 нахождение ложных крестиков и ноликов 
+
+```python
+def mouse_drawing(event, x, y, flags, params):
+    global gl_point1, gl_point2, selecting
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+        selecting = True
+        gl_point1 = (x, y)
+        gl_point2 = (x, y)
+    elif event == cv2.EVENT_MOUSEMOVE:
+        if selecting is True:
+            gl_point2 = (x, y)
+    elif event == cv2.EVENT_LBUTTONUP:
+        selecting = False
+        print('finished square')
+    elif event == cv2.EVENT_RBUTTONUP:
+        selecting = False
+        gl_point1 = gl_point2 = None
+```
