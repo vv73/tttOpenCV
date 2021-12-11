@@ -1,7 +1,7 @@
 # Журнал работы над проектом
 
 ## IP-camera
-Разобраться с IP-камерами, приобрести походящую, разобраться с ней.
+Разобраться с IP-камерами, приобрести подходящую, разобраться с ней.
 
 Выбран VSTARCAM (https://www.vstarcam.com/1056.html) самая дешевая HD  
 c поддержкой onvif-протокола, чтобы общаться с ней из любого софта.
@@ -12,12 +12,12 @@ c поддержкой onvif-протокола, чтобы общаться с 
 **Ccылки**   
 Программа для работы и настройки   
 https://sourceforge.net/projects/onvifdm/  
-Список адресов (у разных камер разный адрес!)  
+Список адресов (у разных камер разный адрес!) получения потока    
 http://www.ispyconnect.com/cameras 
 
 
 ## Распознавание доски, крестиков и ноликов  
-Попробуем так, возможно для игры хватит:  
+Попробуем так, возможно, для игры хватит:  
 
 _Доска_ в аппроксимации - 20-угольник, внутри которого четырехугольник
 ```python   
@@ -63,3 +63,42 @@ def detect_sign(contour):
 но, главное, четырехугольник внутри распознается как нолик...
 
 Начало положено!
+
+## Логика игры
+Найдены в сети и адаптированы функции логики игры. См. файл [tttutils.py](../tttutils.py). 
+
+## Отрисовка позиций
+Написан код отрисовки позиций.
+```python
+ def draw_position(self, img, position=None, left_top=(10, 10), size=90, color=(255, 0, 0)):
+        cv2.rectangle(img, left_top, (left_top[0] + size, left_top[1] + size), (255, 255, 255), -1)
+        if position is None:
+            if len(self.positions) == 0:
+                return
+            position = self.positions[-1]
+
+        cell_size = int(size / 3)
+
+        for i in range(0, size + 1, cell_size):
+            cv2.line(img, (left_top[0] + i, left_top[1]), (left_top[0] + i, left_top[1] + size), color, 2)
+            cv2.line(img, (left_top[0], left_top[1] + i), (left_top[0] + size, left_top[1] + i), color, 2)
+
+        for i in range(3):
+            for j in range(3):
+                if position[i][j] == O:
+                    center = (
+                        left_top[0] + j * cell_size + cell_size // 2, left_top[1] + i * cell_size + cell_size // 2)
+                    cv2.circle(img, center, cell_size // 2 - 5, color, 2)
+                if position[i][j] == X:
+                    cv2.line(img, (left_top[0] + j * cell_size + 5, left_top[1] + i * cell_size + 5),
+                             (left_top[0] + (j + 1) * cell_size - 5, left_top[1] + (i + 1) * cell_size - 5), color, 4)
+                    cv2.line(img, (left_top[0] + (j + 1) * cell_size - 5, left_top[1] + i * cell_size + 5),
+                             (left_top[0] + j * cell_size + 5, left_top[1] + (i + 1) * cell_size - 5), color, 4)
+
+```
+![Отрисовка позиции](Image%20715-2.png)
+
+## Выделение
+
+Написана функция выделения части доски мышью, что предотвращает 
+нахождение ложных крестиков и ноликов 
